@@ -15,8 +15,6 @@ using DBContext context = new DBContext();
 var listener = new TcpListener(ip,port);
 listener.Start();
 
-
-
 List<Car> GetMethod()
 {
     return context.Cars.ToList();
@@ -74,18 +72,15 @@ while (true)
                 bw.Write(json);
                 break;
             case Command.Post:
-                var carToAdd = JsonSerializer.Deserialize<Car>(command.Carss.ToString()!);
-                var postResponce = PostMethod(carToAdd!);
+                var postResponce = PostMethod(command.Carss!);
                 bw.Write(postResponce);
                 break;
             case Command.Put:
-                var carToUpdate = JsonSerializer.Deserialize<Car>(command.Carss.ToString()!);
-                var putResponce = PutMethod(carToUpdate!);
+                var putResponce = PutMethod(command.Carss!);
                 bw.Write(putResponce);
                 break;
             case Command.Delete:
-                var idToDelete = int.Parse(command.Carss.ToString()!);
-                var deleteResponce = DeleteMethod(idToDelete);
+                var deleteResponce = DeleteMethod(command.Carss!.Id);
                 bw.Write(deleteResponce);
                 break;
 

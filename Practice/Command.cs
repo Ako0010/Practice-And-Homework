@@ -7,7 +7,7 @@
     public const string Delete = "DELETE";
     public string? Text { get; set; }
 
-    public List<Car>? Carss { get; set; }
+    public Car? Carss { get; set; }
 
 
 }

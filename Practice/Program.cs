@@ -18,35 +18,46 @@ Command command = null!;
 string responce = null!;
 string str = null!;
 
-while (true)
-{
-    Console.WriteLine("Write Command name or HELP: ");
-    str = Console.ReadLine()!.ToUpper();
-    if (str == "HELP")
-    {
-        Console.WriteLine();
-        Console.WriteLine("GET - to get all cars");
-        Console.WriteLine("POST <Model> <Year> - to add a new car");
-        Console.WriteLine("PUT <Id> <Model> <Year> - to update a car");
-        Console.WriteLine("DELETE <Id> - to delete a car");
-        Console.ReadLine();
-        Console.Clear();
-    }
+var isRunning = true;
 
-    var input = str.Split(' ');
-    switch (input[0])
+while (isRunning)
+{
+    Console.Clear();
+    Console.WriteLine("*****Car Manager***** ");
+    Console.WriteLine("1. List all cars");
+    Console.WriteLine("2. Add new car");
+    Console.WriteLine("3. Update car");
+    Console.WriteLine("4. Delete car by ID");
+    Console.WriteLine("5. Help");
+    Console.WriteLine("0. Exit");
+    Console.WriteLine("********************");
+    Console.Write("Choose option: ");
+
+    string choice = Console.ReadLine()!;
+
+    switch (choice)
     {
-        case Command.Get:
-            command = new Command { Text = input[0] };
+        case "1":
+            command = new Command { Text = Command.Get };
             var json = JsonSerializer.Serialize(command);
             bw.Write(json);
             responce = br.ReadString();
-            Console.WriteLine(responce);
+            var list  = JsonSerializer.Deserialize<List<Car>>(responce);
+            foreach (var car in list!)
+            {
+                Console.WriteLine($"ID: {car.Id}, Model: {car.Model}, Year: {car.Year}");
+            }
             Console.ReadLine();
             Console.Clear();
             break;
-        case Command.Post:
-            command = new Command { Text = input[0], Carss = new List<Car> { new Car { Model = input[1], Year = int.Parse(input[2]) } } };
+        case "2":
+            Console.Write("Enter car model: ");
+            string carModel = Console.ReadLine()!;
+
+            Console.Write("Enter car year: ");
+            int carYear = int.Parse(Console.ReadLine()!);
+
+            command = new Command { Carss = new Car { Model = carModel, Year = carYear }, Text = Command.Post };
             var jsonPost = JsonSerializer.Serialize(command);
             bw.Write(jsonPost);
             responce = br.ReadString();
@@ -54,8 +65,18 @@ while (true)
             Console.ReadLine();
             Console.Clear();
             break;
-        case Command.Put:
-            command = new Command { Text = input[0], Carss = new List<Car> { new Car { Id = int.Parse(input[1]), Model = input[2], Year = int.Parse(input[3]) } } };
+        case "3":
+
+            Console.Write("Enter car ID to update: ");
+            int carId = int.Parse(Console.ReadLine()!);
+
+            Console.Write("Enter car model: ");
+            string carNewModel = Console.ReadLine()!;
+
+            Console.Write("Enter car year: ");
+            int carNewYear = int.Parse(Console.ReadLine()!);
+
+            command = new Command { Carss = new Car { Id = carId, Model = carNewModel, Year = carNewYear }, Text = Command.Put };
             var jsonPut = JsonSerializer.Serialize(command);
             bw.Write(jsonPut);
             responce = br.ReadString();
@@ -63,8 +84,10 @@ while (true)
             Console.ReadLine();
             Console.Clear();
             break;
-        case Command.Delete:
-            command = new Command { Text = input[0], Carss = new List<Car> { new Car { Id = int.Parse(input[1]) } } };
+        case "4":
+            Console.Write("Enter car ID to delete: ");
+            int carDeleteId = int.Parse(Console.ReadLine()!);
+            command = new Command { Carss = new Car { Id = carDeleteId }, Text = Command.Delete };
             var jsonDelete = JsonSerializer.Serialize(command);
             bw.Write(jsonDelete);
             responce = br.ReadString();
@@ -72,5 +95,22 @@ while (true)
             Console.ReadLine();
             Console.Clear();
             break;
+
+        case "5":
+            Console.WriteLine();
+            Console.WriteLine("GET - to get all cars");
+            Console.WriteLine("POST - to add a new car");
+            Console.WriteLine("PUT - to update a car");
+            Console.WriteLine("DELETE - to delete a car");
+            Console.ReadLine();
+            Console.Clear();
+            break;
+        case "0":
+            isRunning = false;
+            client.Close();
+            Console.WriteLine("Client disconnected.");
+            break;
+
     }
+
 }
